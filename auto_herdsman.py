@@ -12,6 +12,15 @@ from common.auto_adb import auto_adb
 pytesseract.pytesseract.tesseract_cmd = 'C:\\Program Files (x86)\\Tesseract-OCR\\tesseract.exe'
 adb = auto_adb()
 
+def wakeup_unlock():
+    """
+    Wake up and unlock the device
+    """
+    adb.run('shell input keyevent 26')
+    time.sleep(2)
+    # Since the unlock process is not universal, a simple swipe up is used here.
+    adb.run('shell input swipe 540 800 540 100')
+
 def pull_screenshot(filename='room.png'):
     process = subprocess.Popen('adb shell screencap -p', shell=True, stdout=subprocess.PIPE)
     screenshot = process.stdout.read()
@@ -33,7 +42,7 @@ def get_time():
     time_remain = pytesseract.image_to_string(time_img)
     h_min_sec = [3600, 60, 1]
     time_sec = sum([a * b for a, b in zip(h_min_sec, map(int, time_remain.split(':')))])
-    print("Time remaining: "+time_remain+'({})s'.format(time_sec))
+    print("Time remaining: "+time_remain+'({}s)'.format(time_sec))
 
     touch(int(0.31 * w), int(0.22 * h))
     print("Got it.")
@@ -49,6 +58,7 @@ def incubate():
     print("Priority: Shortest time")
 
 def collect():
+    # Easy to implement but due to the limited space, a feed function may also be needed
     pass
 
 def sell():
@@ -77,6 +87,7 @@ def touch(left, top):
     time.sleep(3)
 
 if __name__ == "__main__":
+    # Get screen size
     pull_screenshot()
     screen = Image.open('./room.png')
     w, h = screen.size
