@@ -20,6 +20,7 @@ def wakeup_unlock():
     time.sleep(2)
     # Since the unlock process is not universal, a simple swipe up is used here.
     adb.run('shell input swipe 540 800 540 100')
+    time.sleep(2)
 
 def pull_screenshot(filename='room.png'):
     process = subprocess.Popen('adb shell screencap -p', shell=True, stdout=subprocess.PIPE)
@@ -84,20 +85,22 @@ def touch(left, top):
     )
     print(cmd)
     adb.run(cmd)
-    time.sleep(3)
+    time.sleep(random.randint(3, 8))
 
 if __name__ == "__main__":
     # Get screen size
     pull_screenshot()
     screen = Image.open('./room.png')
     w, h = screen.size
-
     while True:
+        sell()
         incubate()
         time_remain = get_time() - 3
+        adb.run('shell input keyevent 26') # Lock screen
         print(datetime.datetime.now())
         for i in range(time_remain):
-            sys.stdout.write("\rWill be back in {} seconds".format(time_remain - i))
+            sys.stdout.write("\rWill be back in {} seconds...   ".format(time_remain - i))
             sys.stdout.flush()
             time.sleep(1)
-        sell()
+        print()
+        wakeup_unlock()
